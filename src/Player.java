@@ -5,7 +5,7 @@ public class Player {
 	char[] moves = new char[]{'s','d','w','a'};
 	
 	public char scoreMove(Matriz m){
-		return moves[bestMove(m,5)];
+		return moves[bestMove(m,6)];
 	}
 	
 	private int bestMove(Matriz m, int cantRec){
