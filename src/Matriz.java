@@ -46,7 +46,7 @@ public class Matriz {
 		this.m[x][y]=n;
 	}
 
-	private boolean agregar2(){
+	public boolean agregar2(){
 		boolean ok = false;
 		for(int[] a:this.m){
 			for(int n:a){

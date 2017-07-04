@@ -24,6 +24,7 @@ public class Player {
 		for (int i=0;i<m.getS();i++){
 			Matriz mAux = new Matriz(m.getM());
 			mAux.mover(i);
+			mAux.agregar2();
 			int score = scoreMoveMinMax(m,mAux,5);
 			if(!mAux.igual(m)){
 				if(score>=max){
@@ -52,11 +53,13 @@ public class Player {
 				}
 			}
 		}
+		puntaje*=(numRec); 
 		int max = 0;
 		if(numRec>=0){
 			for (int i=0;i<mNue.getS();i++){
 				mAux = new Matriz(mNue.getM());
 				mAux.mover(i);
+				mAux.agregar2();
 				int score = scoreMoveMinMax(mNue,mAux,(numRec-1));
 				if(score>=max){
 					max=score;
