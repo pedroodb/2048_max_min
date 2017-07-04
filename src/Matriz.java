@@ -156,7 +156,7 @@ public class Matriz {
 		}
 	}
 	
-	private boolean mover(int dir){
+	public boolean mover(int dir){
 		Matriz mAux = new Matriz(this.getM());
 		for(int i=0;i<dir;i++){
 			this.rotarDerecha();

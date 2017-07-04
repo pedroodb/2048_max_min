@@ -2,6 +2,17 @@ import java.util.Scanner;
 
 public class Test {
 	
+	public static void scoreTest(){
+		Matriz m = new Matriz(true);
+		m.imprimir();
+		Player p = new Player();
+		char op = p.scoreMove(m);
+		while(m.jugar(op)){
+			op = p.scoreMove(m);
+		}
+		System.out.println("Game Over");
+	}
+	
 	public static void randomTest(){
 		Matriz m = new Matriz(true);
 		m.imprimir();
@@ -14,7 +25,7 @@ public class Test {
 	}
 
 	public static void main(String[] args) {
-		Matriz m = new Matriz(true);
+		/*Matriz m = new Matriz(true);
 		m.imprimir();
 		Scanner in = new Scanner(System.in);
 		String cod = in.nextLine();
@@ -23,7 +34,8 @@ public class Test {
 			cod = in.nextLine();
 			op = cod.charAt(0);
 		}
-		System.out.println("Game Over");
+		System.out.println("Game Over");*/
+		scoreTest();
 	}
 
 }
