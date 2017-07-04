@@ -4,28 +4,53 @@ public class Player {
 	
 	char[] moves = new char[]{'s','d','w','a'};
 	
-	/*private int puntuar(Matriz m){
-		int[][] orden = new int[16][3];
-		int k=0;
-		for(int i=0;i<m.getS();i++){
-			for(int j=0;j<m.getS();j++){
-				if(m.getPos(j, i)!=0){
-					orden[k][0]=m.getPos(j, i);
-					orden[k][1]=j;
-					orden[k][2]=i;
+	private boolean agregar2enMasProbable(Matriz m){
+		boolean ok = false;
+		for(int[] a:m.getM()){
+			for(int n:a){
+				if(n==0){
+					ok=true;
 				}
 			}
 		}
-	}*/
+		if(ok){
+			int [] cantMoves = new int[4];
+			for(int i=0;i<4;i++){
+				cantMoves[i]=0;
+			}
+			int max = 0;
+			int posX = 0,posY = 0;
+			for(int i=0;i<m.getS();i++){
+				for(int j=0;j<m.getS();j++){
+					if(m.getPos(j, i)==0){
+						Matriz mAux = new Matriz(m.getM());
+						mAux.setPos(j, i, 2);
+						int move = bestMove(m,0);
+						cantMoves[move]++;
+						if(cantMoves[move]>=max){
+							max = cantMoves[move];
+							posX = j;
+							posY = i;							
+						}
+					}
+				}
+			}
+			m.setPos(posX, posY, 2);
+		}
+		return ok;
+	}
 	
 	public char scoreMove(Matriz m){
+		return moves[bestMove(m,5)];
+	}
+	
+	private int bestMove(Matriz m, int cantRec){
 		int max = 0;
 		int maxMove = -1;
 		for (int i=0;i<m.getS();i++){
 			Matriz mAux = new Matriz(m.getM());
 			mAux.mover(i);
-			mAux.agregar2();
-			int score = scoreMoveMinMax(m,mAux,5);
+			int score = scoreMoveMinMax(new Matriz(m.getM()),new Matriz(mAux.getM()),cantRec);
 			if(!mAux.igual(m)){
 				if(score>=max){
 					max=score;
@@ -33,10 +58,10 @@ public class Player {
 				}
 			}
 		}
-		return moves[maxMove];
+		return maxMove;
 	}
 	
-	private int scoreMoveMinMax(Matriz mAnt, Matriz mNue, int numRec) {
+	private int puntaje(Matriz mAnt, Matriz mNue){
 		Matriz mAux = new Matriz(mNue.getM());
 		for(int i = 0; i<mAnt.getS(); i++){
 			for(int j = 0; j<mAnt.getS(); j++){
@@ -53,13 +78,22 @@ public class Player {
 				}
 			}
 		}
-		puntaje*=(numRec); 
+		return puntaje;
+	}
+	
+	private int scoreMoveMinMax(Matriz mAnt, Matriz mNue, int numRec) {
+		if(numRec>0){
+			this.agregar2enMasProbable(mNue);
+		}
+		int puntaje = this.puntaje(mAnt, mNue);
+		if(numRec!=0){
+			puntaje*=(numRec); 
+		}
 		int max = 0;
-		if(numRec>=0){
+		if(numRec>0){
 			for (int i=0;i<mNue.getS();i++){
-				mAux = new Matriz(mNue.getM());
+				Matriz mAux = new Matriz(mNue.getM());
 				mAux.mover(i);
-				mAux.agregar2();
 				int score = scoreMoveMinMax(mNue,mAux,(numRec-1));
 				if(score>=max){
 					max=score;
