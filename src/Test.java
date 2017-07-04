@@ -1,25 +1,29 @@
 import java.util.Scanner;
 
 public class Test {
+	
+	public static void randomTest(){
+		Matriz m = new Matriz(true);
+		m.imprimir();
+		Player p = new Player();
+		char op = p.randomMove();
+		while(m.jugar(op)){
+			op = p.randomMove();
+		}
+		System.out.println("Game Over");
+	}
 
 	public static void main(String[] args) {
-		matriz m = new matriz();
-		m.agregar2();
+		Matriz m = new Matriz(true);
 		m.imprimir();
 		Scanner in = new Scanner(System.in);
-		String as = in.nextLine();
-		char a = as.charAt(0);
-		boolean ok = true;
-		boolean movio;
-		while(ok){
-			movio = m.mover(a);
-			if(movio){
-				ok=m.agregar2();
-			}
-			m.imprimir();
-			as = in.nextLine();
-			a = as.charAt(0);
+		String cod = in.nextLine();
+		char op = cod.charAt(0);
+		while(m.jugar(op)){
+			cod = in.nextLine();
+			op = cod.charAt(0);
 		}
+		System.out.println("Game Over");
 	}
 
 }
