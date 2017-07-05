@@ -5,10 +5,10 @@ public class Player {
 	char[] moves = new char[]{'s','d','w','a'};
 	
 	public char scoreMove(Matriz m){
-		return moves[bestMove(m,6)];
+		return moves[bestScoreMove(m,5)];
 	}
 	
-	private int bestMove(Matriz m, int cantRec){
+	private int bestScoreMove(Matriz m, int cantRec){
 		int max = 0;
 		int maxMove = -1;
 		for (int i=0;i<m.getS();i++){
@@ -33,8 +33,9 @@ public class Player {
 		if(numRec!=0){									//Modificador de puntaje: que tanto mas valen las jugadas mas ceranas a la inicial con respecto a las siguientes llamadas recursivas
 			puntaje*=(numRec); 
 		}
-		/*if(this.esquinada(mNue)){						//Mod de puntaje: que tanto vale que el mayor esta en una esquina
-			puntaje*=2;
+		/*int esquinada = this.esquinada(mNue);
+		if(esquinada!=0){						//Mod de puntaje: que tanto vale que el mayor esta en una esquina
+			puntaje*=(esquinada+1);
 		}*/
 		int max = 0;
 		if(numRec>0){
@@ -107,7 +108,7 @@ public class Player {
 					if(m.getPos(j, i)==0){
 						Matriz mAux = new Matriz(m.getM());
 						mAux.setPos(j, i, 2);
-						int move = bestMove(m,0);
+						int move = bestScoreMove(m,0);
 						cantMoves[move]++;
 						if(cantMoves[move]>=max){
 							max = cantMoves[move];
@@ -122,22 +123,65 @@ public class Player {
 		return ok;
 	}
 	
-	private boolean esquinada(Matriz m){
-		int posM = getPosMayor(m);
-		int posX = posM%m.getS();
-		int posY = posM/m.getS();
-		boolean esq = false;
-		if(posX==0){
-			if((posY==0)||(posY==(m.getS()-1))){
-				esq=true;
+	private int esquinada(Matriz m){
+		int cant = 0;
+		int[][] array = this.getMatrizAsArray(m);
+		boolean ok = true;
+		int tam = (m.getS()*m.getS());
+		boolean primer = true;
+		while(ok){
+			int posMax = 0;
+			int numMax = 0;
+			int posAnt = 0;
+			for(int i=0;i<tam;i++){
+				if(array[i][0]>numMax){
+					numMax = array[i][0];
+					posMax = i;
+				}
+			}
+			if(numMax == 0){
+				ok = false;
+			}
+			else{
+				array[posMax][0]=0;
+				if(primer){
+					if(array[posMax][1]==0){
+						if((array[posMax][2]==0)||(array[posMax][2]==(m.getS()-1))){
+							cant++;
+						}
+					}
+					else{
+						if(array[posMax][1]==(m.getS()-1)){
+							if((array[posMax][2]==0)||(array[posMax][2]==(m.getS()-1))){
+								cant++;
+							}
+						}
+						else{
+							ok = false;
+						}
+					}
+				}
+				else{
+					if(array[posMax][1]==array[posAnt][1]){
+						if((array[posMax][2]==(array[posAnt][2]+1))||(array[posMax][2]==(array[posAnt][2]-1))){
+							cant++;
+						}
+					}
+					else{
+						if(array[posMax][2]==array[posAnt][2]){
+							if((array[posMax][1]==(array[posAnt][1]+1))||(array[posMax][1]==(array[posAnt][1]-1))){
+								cant++;
+							}
+						}
+						else{
+							ok = false;
+						}
+					}
+				}
+				posAnt = posMax;
 			}
 		}
-		if(posX==m.getS()-1){
-			if((posY==0)||(posY==(m.getS()-1))){
-				esq=true;
-			}
-		}
-		return esq;
+		return cant;
 	}
 	
 	private int getPosMayor(Matriz m) {
@@ -155,8 +199,27 @@ public class Player {
 		return pos;
 	}
 
+	private int [][] getMatrizAsArray(Matriz m){
+		int tam = (m.getS()*m.getS());
+		int[][] mayores = new int[tam][3];
+		for(int i=0;i<tam;i++){
+			mayores[i][0]=0;
+		}
+		int k = 0;
+		for(int i=0; i<m.getS(); i++){
+			for(int j=0; j<m.getS(); j++){
+				mayores[k][0]=m.getPos(j, i);
+				mayores[k][1]=j;
+				mayores[k][2]=i;
+				k++;
+			}
+		}
+		return mayores;
+	}
+	
 	public char randomMove(){
 		Random r = new Random();
 		return moves[r.nextInt(4)];
 	}
+
 }
