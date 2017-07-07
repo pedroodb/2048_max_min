@@ -29,7 +29,7 @@ public class CornerPlayer extends Player{
 		if(numRec>0){
 			this.agregar2enPeor(mNue);
 		}
-		int puntaje = (mNue.puntaje());
+		int puntaje = this.puntaje(mAnt, mNue);
 		if(numRec!=0){							//Modificador de puntaje: que tanto mas valen las jugadas mas ceranas a la inicial con respecto a las siguientes llamadas recursivas
 			puntaje*=(numRec); 
 		}
@@ -52,7 +52,7 @@ public class CornerPlayer extends Player{
 		return puntaje;
 	}
 	
-	/*private int puntaje(Matriz mAnt, Matriz mNue){
+	private int puntaje(Matriz mAnt, Matriz mNue){
 		Matriz mAux = new Matriz(mNue.getM());
 		for(int i = 0; i<mAnt.getS(); i++){
 			for(int j = 0; j<mAnt.getS(); j++){
@@ -70,7 +70,7 @@ public class CornerPlayer extends Player{
 			}
 		}
 		return puntaje;
-	}*/
+	}
 	
 	private boolean delete(Matriz m, int n){
 		boolean ok = false;
