@@ -1,9 +1,12 @@
-import java.util.Arrays;
+package game;
 import java.util.Random;
 
+import IA.CornerPlayer;
+
 public class Matriz {
-	int s = 4;
-	int[][] m = new int[s][s];
+	private int s = 4;
+	private int[][] m = new int[s][s];
+	private int[] puntaje = new int[18];
 
 	public int getS() {
 		return s;
@@ -19,13 +22,20 @@ public class Matriz {
 				m[i][j] = 0;
 			}
 		}
+		for(int i = 0; i < this.puntaje.length; i++){
+			puntaje[i]=0;
+		}
 	}
+
 
 	public Matriz(int[][] m) {					//Clona la matriz pasada como parametro
 		for (int i = 0; i < s; i++) {
 			for (int j = 0; j < s; j++) {
 				this.m[i][j]=m[i][j];
 			}
+		}
+		for(int i = 0; i < this.puntaje.length; i++){
+			puntaje[i]=0;
 		}
 	}
 	
@@ -36,6 +46,9 @@ public class Matriz {
 			}
 		}
 		this.agregar2();
+		for(int i = 0; i < this.puntaje.length; i++){
+			puntaje[i]=0;
+		}
 	}
 	
 	public int getPos(int x,int y){
@@ -68,7 +81,35 @@ public class Matriz {
 		return ok;
 	}
 	
+	public static String fixedLengthString(String string, int length) {
+	    return String.format("%1$"+length+"s", string);
+	}
+	
+	public void imprimirF() {
+		boolean pri = true;
+		for (int[] c : this.m) {
+			System.out.println("-------------------------");
+			for (Integer n : c) {
+				if(n==0){
+					System.out.print("|     ");
+				}
+				else{
+					System.out.print('|'+fixedLengthString(n.toString(),5));
+				}
+			}
+			if(pri){
+				System.out.println("|               Puntaje: "+this.puntaje());
+				pri=false;
+			}
+			else{
+				System.out.println("|");
+			}
+		}
+		System.out.println("-------------------------");
+	}
+	
 	public void imprimir() {
+		boolean pri = true;
 		for (int[] c : this.m) {
 			System.out.println("-------------------------");
 			for (int n : c) {
@@ -94,7 +135,13 @@ public class Matriz {
 					}
 				}
 			}
-			System.out.println("|");
+			if(pri){
+				System.out.println("|               Puntaje: "+this.puntaje());
+				pri=false;
+			}
+			else{
+				System.out.println("|");
+			}
 		}
 		System.out.println("-------------------------");
 	}
@@ -179,6 +226,31 @@ public class Matriz {
 		}
 		return ok;
 	}
+	
+	public int puntaje(){
+		int tot=0;
+		for(int[] row:this.getM()){
+			for(int n: row){
+				if((n!=0)&&(n!=2)){
+					int pos = (int) (Math.log(n)/Math.log(2));
+					if(this.puntaje[pos]!=0){
+						tot += puntaje[pos];
+					}
+					else{
+						int aux = n;
+						int i =1;
+						while(aux!=2){
+							tot+=(i*aux);
+							i*=2;
+							aux/=2;
+						}
+						puntaje[pos]=tot;
+					}
+				}
+			}
+		}
+		return tot;
+	}
 
 	private boolean gameOver(){
 		boolean gO = true;
@@ -208,7 +280,6 @@ public class Matriz {
 			if(mover(cod)){
 				this.agregar2();
 			}
-			this.imprimir();
 		}
 		else{
 			System.out.println("Entrada Invalida");
@@ -216,128 +287,27 @@ public class Matriz {
 		return !this.gameOver();
 	}
 	
-	/*public boolean mover(char dir) {
-		int[][] mAux = new int[s][s];
-		for (int i = 0; i < s; i++) {
-			for (int j = 0; j < s; j++) {
-				mAux[i][j]=this.m[i][j];
-			}
-		}
-		switch (dir) {
-		case 's':
-			for (int i = 0; i < s; i++) {
-				for (int j = s-1; j >= 0; j--) {
-					desplazar(j, i, dir);
-				}
-			}
+	public boolean jugarEvil(char op){
+		int cod=-1;
+		switch(op){
+			case 'w': cod=2;
 			break;
-		case 'a':
-			for (int i = 0; i < s; i++) {
-				for (int j = 0; j < s; j++) {
-					desplazar(i, j, dir);
-				}
-			}
+			case 'a': cod=3;
 			break;
-		case 'w':
-			for (int i = 0; i < s; i++) {
-				for (int j = 0; j < s; j++) {
-					desplazar(j, i, dir);
-				}
-			}
+			case 's': cod=0;
 			break;
-		case 'd':
-			for (int i = 0; i < s; i++) {
-				for (int j = s-1; j >= 0; j--) {
-					desplazar(i, j, dir);
-				}
-			}
+			case 'd': cod=1;
 			break;
 		}
-		boolean movio = false;
-		for (int i = 0; i < s; i++) {
-			for (int j = 0; j < s; j++) {
-				if(m[i][j] != mAux[i][j]){
-					movio = true;
-				}
+		if(cod!=-1){
+			if(mover(cod)){
+				CornerPlayer p = new CornerPlayer();
+				p.agregar2enPeor(this);
 			}
 		}
-		if(movio){
-			return true;
+		else{
+			System.out.println("Entrada Invalida");
 		}
-		else {
-			return false;
-		}
+		return !this.gameOver();
 	}
-
-	private void desplazar(int X, int Y, char dir) {
-		if (m[X][Y] != 0) {
-			boolean ok;
-			switch (dir) {
-			case 's':
-				ok = true;
-				while (X < s-1 && ok) {
-					if (m[X + 1][Y] == 0) {
-						X +=1;
-						m[X][Y] = m[X - 1][Y];
-						m[X - 1][Y] = 0;
-					} else {
-						if (m[X + 1][Y] == m[X][Y]) {
-							m[X + 1][Y] *= 2;
-							m[X][Y] = 0;
-						}
-						ok = false;
-					}
-				}
-				break;
-			case 'a':
-				ok = true;
-				while (Y > 0 && ok) {
-					if (m[X][Y - 1] == 0) {
-						Y -=1;
-						m[X][Y] = m[X][Y + 1];
-						m[X][Y + 1] = 0;
-					} else {
-						if (m[X][Y - 1] == m[X][Y]) {
-							m[X][Y - 1] *= 2;
-							m[X][Y] = 0;
-						}
-						ok = false;
-					}
-				}
-				break;
-			case 'w':
-				ok = true;
-				while (X > 0 && ok) {
-					if (m[X - 1][Y] == 0) {
-						X -=1;
-						m[X][Y] = m[X + 1][Y];
-						m[X + 1][Y] = 0;
-					} else {
-						if (m[X - 1][Y] == m[X][Y]) {
-							m[X - 1][Y] *= 2;
-							m[X][Y] = 0;
-						}
-						ok = false;
-					}
-				}
-				break;
-			case 'd':
-				ok = true;
-				while (Y < s-1 && ok) {
-					if (m[X][Y + 1] == 0) {
-						Y +=1;
-						m[X][Y] = m[X][Y - 1];
-						m[X][Y - 1] = 0;
-					} else {
-						if (m[X][Y + 1] == m[X][Y]) {
-							m[X][Y + 1] *= 2;
-							m[X][Y] = 0;
-						}
-						ok = false;
-					}
-				}
-				break;
-			}
-		}
-	}*/
 }
